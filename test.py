@@ -33,4 +33,13 @@ main_o = GeneratedFile("main.o", dependencies=[main_c, util_h])
 binary = GeneratedFile("foo", dependencies=[util_o, main_o])
 
 graph = boondep.Graph(binary)
-print(str(graph))
+
+traversal = graph.traversal()
+while True:
+  ready_nodes = traversal.drain_ready_nodes()
+  if ready_nodes == None:
+    break
+  print("")
+  for node in ready_nodes:
+    print(node)
+    traversal.done_with_node(node)
