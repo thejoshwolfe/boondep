@@ -2,12 +2,12 @@
 import boondep
 import os
 
-class FileNode(boondep.Node):
-  def __init__(self, path):
-    super(FileNode, self).__init__()
+class GeneratedFile(boondep.Node):
+  def __init__(self, path, *args, **kwargs):
+    super(GeneratedFile, self).__init__(*args, **kwargs)
     self.path = path
   def __repr__(self):
-    return "FileNode({})".format(repr(self.path))
+    return "GeneratedFile({})".format(repr(self.path))
   def needs_action(self, children_needed_updates):
     if any(children_needed_updates):
       return True
@@ -15,8 +15,22 @@ class FileNode(boondep.Node):
   def build(self):
     print("build: " + repr(self))
 
-binary = FileNode("foo")
-source = FileNode("main.c")
-binary.dependencies.append(source)
+class SourceFile(boondep.Node):
+  def __init__(self, path):
+    super(SourceFile, self).__init__()
+    self.path = path
+  def __repr__(self):
+    return "SourceFile({})".format(repr(self.path))
+  def needs_action(self, children_needed_updates):
+    return False
 
-binary.ensure_built()
+util_h = SourceFile("util.h")
+util_c = SourceFile("util.c")
+main_c = SourceFile("main.c")
+
+util_o = GeneratedFile("util.o", dependencies=[util_c, util_h])
+main_o = GeneratedFile("main.o", dependencies=[main_c, util_h])
+binary = GeneratedFile("foo", dependencies=[util_o, main_o])
+
+graph = boondep.Graph(binary)
+print(str(graph))
