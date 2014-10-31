@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import boondep
 import os
+import random
 
 class GeneratedFile(boondep.Node):
   def __init__(self, path, *args, **kwargs):
@@ -35,11 +36,18 @@ binary = GeneratedFile("foo", dependencies=[util_o, main_o])
 graph = boondep.Graph(binary)
 
 traversal = graph.traversal()
+later_nodes = []
 while True:
   ready_nodes = traversal.drain_ready_nodes()
   if ready_nodes == None:
     break
+  ready_nodes += later_nodes
+  later_nodes = []
   print("")
   for node in ready_nodes:
-    print(node)
-    traversal.done_with_node(node)
+    done = random.random() < 0.5
+    print(repr(node) + ": " + repr(done))
+    if done:
+      traversal.done_with_node(node)
+    else:
+      later_nodes.append(node)
