@@ -8,13 +8,15 @@ class FileNode(boondep.Node):
     self.path = path
   def __repr__(self):
     return "FileNode({})".format(repr(self.path))
-  def needs_action(self):
-    if any(child.needs_action() for child in self.dependencies):
+  def needs_action(self, children_needed_updates):
+    if any(children_needed_updates):
       return True
     return not os.path.isfile(self.path)
+  def build(self):
+    print("build: " + repr(self))
 
 binary = FileNode("foo")
 source = FileNode("main.c")
 binary.dependencies.append(source)
 
-binary.build()
+binary.ensure_built()
