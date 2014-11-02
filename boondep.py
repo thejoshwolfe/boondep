@@ -28,21 +28,17 @@ class Graph(object):
     graph = self
     class Traversal(object):
       def __init__(self):
-        self.in_progress_nodes = set()
         self.done_nodes = set()
       def drain_ready_nodes(self):
         if len(self.done_nodes) == len(graph.nodes):
           return None
         ready_nodes = [
           node for node in graph.nodes
-          if node not in self.in_progress_nodes
-          and node not in self.done_nodes
+          if node not in self.done_nodes
           and graph.node_to_dependency_closure[node] <= self.done_nodes
         ]
-        self.in_progress_nodes.update(ready_nodes)
         return ready_nodes
       def done_with_node(self, node):
-        self.in_progress_nodes.remove(node)
         self.done_nodes.add(node)
     return Traversal()
   def __str__(self):
