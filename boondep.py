@@ -4,18 +4,8 @@ class Node(object):
     self.dependencies = []
     if dependencies != None:
       self.dependencies.extend(dependencies)
-  def ensure_built(self):
-    children_needed_updates = [dependency.ensure_built() for dependency in self.dependencies]
-    if self.needs_action(children_needed_updates):
-      self.build()
-      return True
-    return False
   def __hash__(self):
     return id(self)
-  def build(self):
-    raise NotImplementedError()
-  def needs_action(self, children_needed_updates):
-    raise NotImplementedError()
 
 class Graph(object):
   def __init__(self, *roots):
@@ -34,13 +24,6 @@ class Graph(object):
     for root in roots:
       recurse(root)
     self.nodes = list(self.node_to_dependency_closure.keys())
-    # TODO: why are we sorting anything?
-    class ComparableWithDependencyCloser(object):
-      def __init__(self, node):
-        self.node = node
-      def __lt__(self, other):
-        return self.node in node_to_dependency_closure[other.node]
-    self.nodes.sort(key=ComparableWithDependencyCloser)
   def traversal(self):
     graph = self
     class Traversal(object):
