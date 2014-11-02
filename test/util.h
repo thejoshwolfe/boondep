@@ -1,0 +1,2 @@
+
+int generate_number();
